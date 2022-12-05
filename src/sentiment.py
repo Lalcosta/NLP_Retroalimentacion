@@ -1,7 +1,7 @@
 #Library to get model
 from transformers import pipeline
 from datasets import load_dataset
-class WarmUp:
+class SentimentAnalysis:
     
     def __init__(self,test):
         self.test=1
