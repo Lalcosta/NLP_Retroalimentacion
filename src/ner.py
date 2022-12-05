@@ -4,14 +4,21 @@ import matplotlib.pyplot as plt
 import numpy as np
 import torch
 import pandas as pd
-  
+
+#Class for Re-training a NER model
 class NerTraining:
     def __init__(self):
+        #Dataset
         self.data=load_dataset("conll2003") 
+        #Tokenizer
         self.tokenizer= BertTokenizerFast.from_pretrained("bert-base-uncased") 
+        #Model for re-train
         self.model= AutoModelForTokenClassification.from_pretrained("bert-base-uncased", num_labels=9)
+        #If you have a gpu you can use this for training
         self.torch_device='cuda' if torch.cuda.is_available() else 'cpu'
+        #Send model to gpu
         self.model = self.model.to(self.torch_device)
+        #Training arguments
         self.args = TrainingArguments( 
                                     "test-ner",
                                     evaluation_strategy = "epoch", 
@@ -21,10 +28,9 @@ class NerTraining:
                                     num_train_epochs=10, 
                                     weight_decay=0.01, 
                                     ) 
-         
-    def test():
-        test=load_dataset("conll2003")
-        if len(test)!=0:
+    #Test to verify data is stored
+    def test(self):
+        if len(self.data)!=0:
             return "NER Trainer data is loaded"
         else: return "Data not loaded"
         
@@ -34,7 +40,7 @@ class NerTraining:
         labels = [] 
         for i, label in enumerate(data["ner_tags"]): 
             word_ids = self.tokens.word_ids(batch_index=i) 
-            # ids() => Return a list mapping the tokens
+            # word_ids() => Return a list mapping the tokens
             # to their actual word in the initial sentence.
             # It Returns a list indicating the word corresponding to each token. 
             prev_id = None 
@@ -63,7 +69,7 @@ class NerTraining:
         return self.tokens 
 
     
-    
+    #Metric to compute during training
     def compute_metrics(self, eval_preds): 
         self.metric = load_metric("seqeval") 
         self.label_list = self.data["train"].features["ner_tags"].feature.names
@@ -78,7 +84,7 @@ class NerTraining:
             [self.label_list[eval_preds] for (eval_preds, l) in zip(prediction, label) if l != -100] 
             for prediction, label in zip(pred_logits, labels) 
         ] 
-        
+        #For testing during training
         true_labels = [ 
         [self.label_list[l] for (eval_preds, l) in zip(prediction, label) if l != -100] 
         for prediction, label in zip(pred_logits, labels) 
@@ -91,11 +97,14 @@ class NerTraining:
                 "accuracy": results["overall_accuracy"], 
                 } 
 
-
+    #Function to re-train model
     def retrain(self):
-    
+        #Use tokenized datasets
         self.tokenized_datasets = self.data.map(self.conll2003_tokenizer, batched=True)
         data_collator = DataCollatorForTokenClassification(self.tokenizer) 
+        
+        #Creating the trainer with model, training arguments, tokenized train dataset, 
+        #tokenized test dataset, tokenizer and metrics to compute
         trainer = Trainer( 
             self.model, 
             self.args, 
@@ -105,10 +114,15 @@ class NerTraining:
         tokenizer=self.tokenizer, 
         compute_metrics=self.compute_metrics 
         ) 
+        #Re-train model
         trainer.train()
 
+        #After training computed metrics were printed so I created a csv file with those metrics
+        #Acces csv file
         loss=pd.read_csv("errors.csv")
+        #Plot train loss
         plt.plot(loss["Epoch"],loss["Train_loss"], label="Train loss")
+        #Plot test loss
         plt.plot(loss["Epoch"],loss["Ev_loss"], label="Train errors")
         plt.title("Test error vs train error")
         plt.show()
