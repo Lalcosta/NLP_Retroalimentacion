@@ -11,15 +11,15 @@ This is the repo for the NLP module
 4. Excecute `pip install -r requirements.txt`
 
 ## .env file
-1. In order to run task 3 yo need ibm and microsoft keys
+1. In order to run task 3 you need ibm and microsoft keys
 2. Create a .env file whith the following api keys
 
 ```
-IBM_KEY= "<Your IBM key here>"
-IBM_URL="<Your IBM url here>"
+IBM_KEY= "Your IBM key here"
+IBM_URL="Your IBM url here"
 
-MICROSOFT_KEY="<Your MICROSOFT key here>"
-MICROSOFT_REGION="<Your MICROSOFT region here>"
+MICROSOFT_KEY="Your MICROSOFT key here"
+MICROSOFT_REGION="Your MICROSOFT region here"
 MICROSOFT_ENDPOINT="https://api.cognitive.microsofttranslator.com"
 ```
 * NOTE: KEEP MICROSOFT ENDPOINT AS SHOWED
