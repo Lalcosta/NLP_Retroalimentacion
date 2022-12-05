@@ -3,7 +3,7 @@ _Author: Eduardo Acosta Hernández_
 
 This is the repo for the NLP module
 
-###Installation and running
+## Installation and running
 
 1. Create a virtual environmet
 2. Activate virtual environment
